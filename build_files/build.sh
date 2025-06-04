@@ -11,6 +11,7 @@ set -ouex pipefail
 
 # this installs a package from fedora repos
 dnf5 install -y cowsay
+dnf5 install -y virt-install
 
 # Use a COPR Example:
 #
