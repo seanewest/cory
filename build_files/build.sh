@@ -19,8 +19,28 @@ dnf5 install -y \
   make \
   perl
 
+echo -e '#!/bin/sh\nexit 0' > /sbin/vboxconfig
+chmod +x /sbin/vboxconfig
+
 curl -L 'https://download.virtualbox.org/virtualbox/7.1.10/VirtualBox-7.1-7.1.10_169112_fedora40-1.x86_64.rpm' > vbox.rpm
 dnf5 install -y vbox.rpm || true
+
+
+cat > /etc/systemd/system/vbox-init.service <<'EOF'
+[Unit]
+Description=Build VirtualBox kernel modules on first boot
+After=network.target
+ConditionPathExists=!/lib/modules/$(uname -r)/extra/vboxdrv.ko
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/vboxconfig
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+ln -s /etc/systemd/system/vbox-init.service /etc/systemd/system/multi-user.target.wants/vbox-init.service
 
 cat > /etc/systemd/system/akmods-init.service <<'EOF'
 [Unit]
