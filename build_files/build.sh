@@ -11,9 +11,38 @@ set -ouex pipefail
 
 # this installs a package from fedora repos
 
-dnf5 install -y virt-install kernel-devel-matched
-curl -L 'https://download.virtualbox.org/virtualbox/7.1.10/VirtualBox-7.1-7.1.10_169112_fedora40-1.x86_64.rpm' > vbox.rpm
-dnf5 install -y vbox.rpm
+#dnf5 install -y virt-install
+#curl -L 'https://download.virtualbox.org/virtualbox/7.1.10/VirtualBox-7.1-7.1.10_169112_fedora40-1.x86_64.rpm' > vbox.rpm
+#dnf5 install -y vbox.rpm
+
+dnf5 install -y \
+  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-41.noarch.rpm \
+  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-41.noarch.rpm
+
+dnf5 install -y \
+  VirtualBox \
+  akmod-VirtualBox \
+  kernel-devel \
+  gcc \
+  make \
+  perl
+
+cat > /etc/systemd/system/akmods-init.service <<'EOF'
+[Unit]
+Description=Build VirtualBox kernel modules on first boot
+After=network.target
+ConditionPathExists=!/lib/modules/$(uname -r)/extra/vboxdrv.ko
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/akmods --force && /usr/bin/modprobe vboxdrv
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+ln -s /etc/systemd/system/akmods-init.service /etc/systemd/system/multi-user.target.wants/akmods-init.service
+
 
 # Use a COPR Example:
 #
