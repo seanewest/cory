@@ -23,7 +23,8 @@ curl -L 'https://download.virtualbox.org/virtualbox/7.1.10/VirtualBox-7.1-7.1.10
 dnf5 install -y vbox.rpm || true
 
 
-cat > /etc/systemd/system/vbox-init.service <<'EOF'
+# Create unit file in /usr/lib
+cat > /usr/lib/systemd/system/vbox-init.service <<'EOF'
 [Unit]
 Description=Run vboxconfig on first boot to build VirtualBox kernel modules
 After=network.target
@@ -37,7 +38,8 @@ ExecStart=/sbin/vboxconfig
 WantedBy=multi-user.target
 EOF
 
-ln -s /etc/systemd/system/vbox-init.service /etc/systemd/system/multi-user.target.wants/vbox-init.service
+# Enable the unit (creates symlink in /etc/systemd/system/)
+systemctl enable vbox-init.service
 
 
 # Use a COPR Example:
