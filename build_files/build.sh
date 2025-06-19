@@ -19,9 +19,14 @@ dnf5 install -y \
   make \
   perl
 
-curl -L 'https://download.virtualbox.org/virtualbox/7.1.10/VirtualBox-7.1-7.1.10_169112_fedora40-1.x86_64.rpm' > vbox.rpm
-dnf5 install -y vbox.rpm || true
 
+# Prevent vboxconfig scriptlet from failing during install
+echo -e '#!/bin/sh\nexit 0' > /sbin/vboxconfig
+chmod +x /sbin/vboxconfig
+
+# Install VirtualBox RPM cleanly
+curl -L 'https://download.virtualbox.org/virtualbox/7.1.10/VirtualBox-7.1-7.1.10_169112_fedora40-1.x86_64.rpm' > vbox.rpm
+dnf5 install -y vbox.rpm
 
 # Create unit file in /usr/lib
 cat > /usr/lib/systemd/system/vbox-init.service <<'EOF'
@@ -38,8 +43,8 @@ ExecStart=/sbin/vboxconfig
 WantedBy=multi-user.target
 EOF
 
-# Enable the unit (creates symlink in /etc/systemd/system/)
-systemctl enable vbox-init.service
+# Enable it in bootc-safe way
+ln -s ../vbox-init.service /usr/lib/systemd/system/multi-user.target.wants/vbox-init.service
 
 
 # Use a COPR Example:
