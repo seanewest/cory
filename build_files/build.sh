@@ -10,10 +10,10 @@ set -ouex pipefail
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/39/x86_64/repoview/index.html&protocol=https&redirect=1
 
 # this installs a package from fedora repos
-dnf5 install -y cowsay
-dnf5 install -y virt-install
-dnf5 install -y neovim
 
+dnf5 install -y virt-install kernel-devel-matched
+curl -L 'https://download.virtualbox.org/virtualbox/7.1.10/VirtualBox-7.1-7.1.10_169112_fedora40-1.x86_64.rpm' > vbox.rpm
+dnf5 install -y vbox.rpm
 
 # Use a COPR Example:
 #
