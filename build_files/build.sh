@@ -12,20 +12,15 @@ set -ouex pipefail
 # this installs a package from fedora repos
 
 #dnf5 install -y virt-install
-#curl -L 'https://download.virtualbox.org/virtualbox/7.1.10/VirtualBox-7.1-7.1.10_169112_fedora40-1.x86_64.rpm' > vbox.rpm
-#dnf5 install -y vbox.rpm
 
 dnf5 install -y \
-  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-41.noarch.rpm \
-  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-41.noarch.rpm
-
-dnf5 install -y \
-  VirtualBox \
-  akmod-VirtualBox \
-  kernel-devel \
+  kernel-devel-matched \
   gcc \
   make \
   perl
+
+curl -L 'https://download.virtualbox.org/virtualbox/7.1.10/VirtualBox-7.1-7.1.10_169112_fedora40-1.x86_64.rpm' > vbox.rpm
+dnf5 install -y vbox.rpm || true
 
 cat > /etc/systemd/system/akmods-init.service <<'EOF'
 [Unit]
